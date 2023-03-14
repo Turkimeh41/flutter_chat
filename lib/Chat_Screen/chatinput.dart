@@ -34,6 +34,7 @@ class _ChatInputState extends State<ChatInput> {
               },
               style: GoogleFonts.aBeeZee(color: Colors.white),
               decoration: const InputDecoration(
+                hintText: 'Send a message...',
                 focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.black)),
                 fillColor: Color.fromARGB(255, 73, 78, 122),
                 filled: true,

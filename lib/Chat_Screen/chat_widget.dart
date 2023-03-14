@@ -10,14 +10,19 @@ class ChatWidget extends StatelessWidget {
   final QueryDocumentSnapshot<Map<String, dynamic>> document;
   @override
   Widget build(BuildContext context) {
+    bool thisUser = document['uid'] == FirebaseAuth.instance.currentUser!.uid;
     final messageLength = (document['text'] as String).length;
     return Row(
-      mainAxisAlignment: document['uid'] == FirebaseAuth.instance.currentUser!.uid ? MainAxisAlignment.start : MainAxisAlignment.end,
+      mainAxisAlignment: thisUser ? MainAxisAlignment.end : MainAxisAlignment.start,
       children: [
         Container(
           margin: EdgeInsets.only(left: 5, top: 15),
           padding: EdgeInsets.only(top: 10, left: 10, right: messageLength.toDouble() + 20, bottom: 10),
-          decoration: BoxDecoration(color: Color.fromARGB(255, 64, 116, 174), borderRadius: BorderRadius.circular(14)),
+          decoration: BoxDecoration(
+              color: thisUser ? Color.fromARGB(255, 75, 64, 174) : Colors.purple[600],
+              borderRadius: thisUser
+                  ? BorderRadius.only(topLeft: Radius.circular(15), topRight: Radius.circular(15), bottomLeft: Radius.circular(15), bottomRight: Radius.circular(3))
+                  : BorderRadius.only(topLeft: Radius.circular(15), topRight: Radius.circular(15), bottomLeft: Radius.circular(3), bottomRight: Radius.circular(15))),
           child: SizedBox(width: 100, child: Text(document['text'], style: GoogleFonts.acme(color: Colors.white))),
         ),
       ],
