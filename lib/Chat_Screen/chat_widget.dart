@@ -1,15 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 class ChatWidget extends StatelessWidget {
-  const ChatWidget({required this.document, super.key});
+  const ChatWidget({required this.document, required this.userDoc, super.key});
   final QueryDocumentSnapshot<Map<String, dynamic>> document;
-
+  final DocumentSnapshot<Map<String, dynamic>> userDoc;
   int calculateDifference(DateTime date) {
     DateTime now = DateTime.now();
     return DateTime(date.year, date.month, date.day).difference(DateTime(now.year, now.month, now.day)).inDays;
@@ -33,6 +31,9 @@ class ChatWidget extends StatelessWidget {
                   : const BorderRadius.only(topLeft: Radius.circular(15), topRight: Radius.circular(15), bottomLeft: Radius.circular(15), bottomRight: Radius.circular(2))),
           child: Column(
             children: [
+              SizedBox(
+                child: Text(userDoc['username']),
+              ),
               SizedBox(width: 100, child: Text(document['text'], style: GoogleFonts.acme(color: Colors.white))),
               SizedBox(
                 height: 5,
