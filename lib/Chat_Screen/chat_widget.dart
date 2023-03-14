@@ -22,8 +22,8 @@ class ChatWidget extends StatelessWidget {
       mainAxisAlignment: thisUser ? MainAxisAlignment.start : MainAxisAlignment.end,
       children: [
         Container(
-          margin: const EdgeInsets.only(left: 5, top: 15),
-          padding: EdgeInsets.only(top: 10, left: 10, bottom: 10),
+          margin: EdgeInsets.only(left: thisUser ? 8 : 0, top: 15, right: !thisUser ? 8 : 0),
+          padding: EdgeInsets.only(top: 5, left: 5, right: 10, bottom: 10),
           decoration: BoxDecoration(
               color: thisUser ? Colors.purple[600] : const Color.fromARGB(255, 75, 64, 174),
               borderRadius: thisUser
@@ -32,14 +32,20 @@ class ChatWidget extends StatelessWidget {
           child: Column(
             children: [
               SizedBox(
-                child: Text(userDoc['username']),
+                  width: 100,
+                  child: Text(
+                    userDoc['username'],
+                    textAlign: thisUser ? TextAlign.start : TextAlign.end,
+                  )),
+              SizedBox(
+                height: 5,
               ),
               SizedBox(width: 100, child: Text(document['text'], style: GoogleFonts.acme(color: Colors.white))),
               SizedBox(
                 height: 5,
               ),
               SizedBox(
-                width: 80,
+                width: 100,
                 child: Text(
                   textAlign: TextAlign.end,
                   calculateDifference(sendAt) <= -1 ? DateFormat().format(sendAt) : DateFormat.jms().format(sendAt),
