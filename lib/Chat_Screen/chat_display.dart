@@ -10,6 +10,8 @@ class ChatDisplay extends StatefulWidget {
   State<ChatDisplay> createState() => _ChatDisplayState();
 }
 
+ScrollController _controller = ScrollController();
+
 class _ChatDisplayState extends State<ChatDisplay> {
   @override
   Widget build(BuildContext context) {
@@ -21,22 +23,21 @@ class _ChatDisplayState extends State<ChatDisplay> {
           }
 
           return StreamBuilder(
-            stream: FirebaseFirestore.instance.collection('chat').orderBy('sendAt').snapshots(),
+            stream: FirebaseFirestore.instance.collection('chat').orderBy('sendAt', descending: true).snapshots(),
             builder: (context, streamSnapshot) {
               if (streamSnapshot.connectionState == ConnectionState.waiting) {
                 return const Center(
                   child: CircularProgressIndicator(),
                 );
               }
+
               final documents = streamSnapshot.data!.docs;
               return ListView.builder(
+                reverse: true,
+                shrinkWrap: true,
+                controller: _controller,
                 itemBuilder: (context, index) {
-                  return ChatWidget(
-                      document: documents[index],
-                      userDoc: snapshot.data!); /* Text(
-                    documents[index]['text'],
-                    style: const TextStyle(color: Colors.white),
-                  ); */
+                  return ChatWidget(document: documents[index], userDoc: snapshot.data!);
                 },
                 itemCount: documents.length,
               );
