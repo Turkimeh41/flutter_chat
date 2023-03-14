@@ -24,6 +24,8 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
   late Animation<double> femaleFadeAnimation;
   late AudioPlayer audio;
   final GlobalKey<FormState> key = GlobalKey();
+  int state = 0;
+  bool loading = false;
   Gender? gender;
   String? _email;
   String? _username;
@@ -100,7 +102,16 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
     }
     if (isvalid) {
       key.currentState!.save();
+      setState(() {
+        loading = true;
+      });
       await widget.submit(email: _email!, password: _password!, login: false, username: _username, gender: gender!.index);
+      Future.delayed(Duration(milliseconds: 400), () {
+        setState(() {
+          loading = false;
+          state = 1;
+        });
+      });
     }
   }
 
@@ -169,8 +180,8 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                                   value.startsWith('8') ||
                                   value.startsWith('9')) {
                                 return 'Username Cannot start with a number';
-                              } else if (value.length <= 8) {
-                                return 'Please enter a Username that is longer than 8 Characters';
+                              } else if (value.length <= 4) {
+                                return 'Please enter a Username that is longer than 5 Characters';
                               }
                               return null;
                             },
@@ -256,17 +267,55 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                 )),
             //BLACK BOX CONTAINER
             Positioned(
-              bottom: device.height * 0.20,
-              height: device.height * 0.13,
+              bottom: device.height * 0.155,
+              height: device.height * 0.17,
               width: device.width * 0.65,
               child: Container(
-                decoration: BoxDecoration(color: Colors.black.withOpacity(0.3), borderRadius: const BorderRadius.all(Radius.circular(20))),
+                decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.3),
+                    borderRadius: const BorderRadius.only(
+                      bottomLeft: Radius.circular(0),
+                      bottomRight: Radius.circular(0),
+                      topLeft: Radius.circular(15),
+                      topRight: Radius.circular(15),
+                    )),
               ),
             ),
+            Positioned(
+                bottom: device.height * 0.284,
+                right: device.width * 0.62,
+                child: ColorFiltered(
+                    colorFilter: gender != Gender.Male
+                        ? greyscale
+                        : const ColorFilter.mode(
+                            Colors.transparent,
+                            BlendMode.saturation,
+                          ),
+                    child: const Icon(
+                      size: 32,
+                      Icons.male_rounded,
+                      color: Colors.blue,
+                    ))),
+            Positioned(
+                bottom: device.height * 0.284,
+                right: device.width * 0.295,
+                child: ColorFiltered(
+                    colorFilter: gender != Gender.Female
+                        ? greyscale
+                        : const ColorFilter.mode(
+                            Colors.transparent,
+                            BlendMode.saturation,
+                          ),
+                    child: const Icon(
+                      size: 32,
+                      Icons.female_rounded,
+                      color: Colors.pink,
+                    ))),
             //Circle for Male
+
             Positioned(
                 left: device.width * 0.22,
-                bottom: device.height * 0.16,
+                bottom: device.height * 0.11,
                 child: FadeTransition(
                   opacity: maleFadeAnimation,
                   child: Container(
@@ -283,7 +332,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                 )),
             Positioned(
                 left: device.width * 0.553,
-                bottom: device.height * 0.16,
+                bottom: device.height * 0.11,
                 child: FadeTransition(
                   opacity: femaleFadeAnimation,
                   child: Container(
@@ -300,7 +349,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                 )),
             Positioned(
               left: device.width * 0.168,
-              bottom: device.height * 0.18,
+              bottom: device.height * 0.133,
               child: InkWell(
                 child: ColorFiltered(
                     colorFilter: gender != Gender.Male ? greyscale : const ColorFilter.mode(Colors.transparent, BlendMode.saturation),
@@ -321,7 +370,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
             ),
             Positioned(
               left: device.width * 0.5,
-              bottom: device.height * 0.18,
+              bottom: device.height * 0.133,
               child: InkWell(
                 child: ColorFiltered(
                     colorFilter: gender != Gender.Female ? greyscale : const ColorFilter.mode(Colors.transparent, BlendMode.saturation),
@@ -341,7 +390,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
               ),
             ),
             Positioned(
-                bottom: device.height * 0.11,
+                bottom: device.height * 0.07,
                 height: device.height * 0.08,
                 child: Column(
                   children: [
@@ -352,25 +401,28 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                           style: GoogleFonts.aclonica(color: Colors.red, fontSize: 14),
                         )),
                     FadeTransition(
-                      opacity: fadeAnimation,
-                      child: ElevatedButton(
-                          style: ButtonStyle(
-                              fixedSize: MaterialStatePropertyAll(Size(device.width * 0.8, device.height * 0.01)),
-                              shape: const MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15)))),
-                              backgroundColor: const MaterialStatePropertyAll(
-                                Colors.amber,
+                        opacity: fadeAnimation,
+                        child: Visibility(
+                          visible: !loading,
+                          child: ElevatedButton(
+                              style: ButtonStyle(
+                                  fixedSize: MaterialStatePropertyAll(Size(device.width * 0.8, device.height * 0.01)),
+                                  shape: const MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15)))),
+                                  backgroundColor: const MaterialStatePropertyAll(
+                                    Colors.amber,
+                                  )),
+                              onPressed: () async {
+                                await playsound('audios/flourish_sound.mp3');
+                                await submitted();
+                              },
+                              child: Text(
+                                'REGISTER',
+                                style: GoogleFonts.archivoNarrow(fontSize: 24),
                               )),
-                          onPressed: () async {
-                            await playsound('audios/flourish_sound.mp3');
-                            await submitted();
-                          },
-                          child: Text(
-                            'REGISTER',
-                            style: GoogleFonts.archivoNarrow(fontSize: 24),
-                          )),
-                    ),
+                        )),
                   ],
                 )),
+            Positioned(bottom: device.height * 0.017, child: Visibility(visible: loading, child: Lottie.asset('assets/animations/linear_loading.json', width: 128, height: 128))),
             Positioned(
                 bottom: device.height * 0.04,
                 child: GestureDetector(
