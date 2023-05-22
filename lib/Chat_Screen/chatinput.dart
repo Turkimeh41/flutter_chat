@@ -1,38 +1,41 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:last_module/CHAT_SCREEN/chat_handler.dart';
 
 class ChatInput extends StatefulWidget {
-  const ChatInput({super.key});
-
+  const ChatInput({super.key, required this.handler});
+  final ChatHandler handler;
   @override
   State<ChatInput> createState() => _ChatInputState();
 }
 
 class _ChatInputState extends State<ChatInput> {
-  TextEditingController messageController = TextEditingController();
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final devH = MediaQuery.of(context).size.height;
-    final devW = MediaQuery.of(context).size.width;
+    widget.handler.chatInputsetState = setState;
+    final dh = MediaQuery.of(context).size.height;
+    final dw = MediaQuery.of(context).size.width;
     return Container(
-      padding: EdgeInsets.only(left: 10, bottom: 3),
+      padding: const EdgeInsets.only(left: 10, bottom: 3),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           SizedBox(
-            height: devH * 0.06,
-            width: devW * 0.80,
+            height: dh * 0.06,
+            width: dw * 0.80,
             child: TextField(
-              controller: messageController,
-              onChanged: (value) {
+              focusNode: widget.handler.messageFocus,
+              controller: widget.handler.messageController,
+              onChanged: (_) {
                 setState(() {});
               },
-              style: GoogleFonts.aBeeZee(color: Colors.white),
+              style: GoogleFonts.actor(color: Colors.white),
               decoration: const InputDecoration(
                 hintText: 'Send a message...',
                 focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.black)),
@@ -47,17 +50,9 @@ class _ChatInputState extends State<ChatInput> {
             ),
           ),
           IconButton(
-            onPressed: messageController.text.trim().isEmpty
-                ? null
-                : () {
-                    FirebaseFirestore.instance.collection('/chat').add({'text': messageController.text, 'sendAt': Timestamp.now(), 'uid': FirebaseAuth.instance.currentUser!.uid});
-                    setState(() {
-                      messageController.text = '';
-                      FocusScope.of(context).unfocus();
-                    });
-                  },
+            onPressed: widget.handler.messageController.text.trim().isEmpty ? null : () => widget.handler.sendMessage(),
             icon: const Icon(Icons.send_rounded),
-            iconSize: 50,
+            iconSize: 42,
             color: Colors.amber,
           )
         ],
