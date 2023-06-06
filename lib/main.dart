@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:last_module/MAIN_MENU/main_menu.dart';
 import 'package:last_module/Provider/chat_provider.dart';
 import 'package:last_module/Provider/users_provider.dart';
-import 'package:last_module/splash_screen.dart';
 import 'AUTH_SCREEN/LOGIN_SCREEN/login_screen.dart';
 import 'package:get/get.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -41,7 +40,7 @@ class MyApp extends StatelessWidget {
             ),
           ),
           home: StreamBuilder<User?>(
-            stream: FirebaseAuth.instance.authStateChanges(),
+            stream: FirebaseAuth.instance.userChanges(),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 return Consumer<Chats>(
